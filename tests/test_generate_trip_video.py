@@ -160,6 +160,24 @@ def test_main_happy_path_invokes_visualizer(mock_fetch, mock_run, mock_output_di
     assert mock_fetch.call_args[0][1] == 'test-key'
 
 
+@patch('generate_trip_video.output_dir_is_mounted', return_value=True)
+@patch('generate_trip_video.run_visualizer', return_value=0)
+@patch('generate_trip_video.fetch_points')
+def test_main_confines_output_to_output_dir(mock_fetch, mock_run, mock_output_dir, monkeypatch):
+    monkeypatch.setenv('DAWARICH_URL', 'http://localhost:3000')
+    monkeypatch.setenv('DAWARICH_API_KEY', 'test-key')
+    mock_fetch.return_value = [{'latitude': '1', 'longitude': '2', 'timestamp': 100}]
+
+    exit_code = gtv.main([
+        '--start', '2026-07-12', '--end', '2026-07-26', '--title', 'Ceara 2026',
+        '--output', '../../etc/passwd',
+    ])
+
+    assert exit_code == 0
+    output_path = mock_run.call_args[0][4]
+    assert output_path == gtv.Path('/output/passwd')
+
+
 def test_main_exits_when_dawarich_url_missing(monkeypatch, capsys):
     monkeypatch.delenv('DAWARICH_URL', raising=False)
     monkeypatch.setenv('DAWARICH_API_KEY', 'test-key')

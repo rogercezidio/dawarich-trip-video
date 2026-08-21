@@ -188,7 +188,7 @@ def main(argv=None):
 
     timeline_data = points_to_timeline_json(points)
 
-    output_name = args.output or f"{slugify_title(args.title)}.mp4"
+    output_name = Path(args.output).name if args.output else f"{slugify_title(args.title)}.mp4"
     output_path = Path('/output') / output_name
 
     with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as tmp_file:
