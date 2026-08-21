@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+import generate_trip_video as gtv
 from generate_trip_video import slugify_title, points_to_timeline_json, fetch_points, DawarichApiError
 
 
@@ -113,9 +114,6 @@ def test_fetch_points_raises_dawarich_api_error_on_non_numeric_total_pages(mock_
 
     with pytest.raises(DawarichApiError):
         fetch_points('http://localhost:3000', 'key', date(2026, 7, 12), date(2026, 7, 12))
-
-
-import generate_trip_video as gtv
 
 
 def test_resolve_setting_prefers_flag_over_env(monkeypatch):
