@@ -50,6 +50,7 @@ def points_to_timeline_json(points):
 
 def fetch_points(base_url, api_key, start_date, end_date, per_page=DEFAULT_PER_PAGE):
     """Fetch all points in [start_date, end_date] from the Dawarich points API, paginated."""
+    base_url = base_url.rstrip('/')
     headers = {'Authorization': f'Bearer {api_key}'}
     params = {
         'start_at': f'{start_date.isoformat()}T00:00:00Z',

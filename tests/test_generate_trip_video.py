@@ -54,6 +54,16 @@ def test_fetch_points_single_page(mock_get):
 
 
 @patch('generate_trip_video.requests.get')
+def test_fetch_points_strips_trailing_slash_from_base_url(mock_get):
+    mock_get.return_value = _mock_response([{'latitude': '1', 'longitude': '2', 'timestamp': 100}])
+
+    fetch_points('http://localhost:3000/', 'key', date(2026, 7, 12), date(2026, 7, 12))
+
+    requested_url = mock_get.call_args[0][0]
+    assert requested_url == 'http://localhost:3000/api/v1/points'
+
+
+@patch('generate_trip_video.requests.get')
 def test_fetch_points_paginates_until_total_pages_reached(mock_get):
     mock_get.side_effect = [
         _mock_response([{'latitude': '1', 'longitude': '2', 'timestamp': 100}], total_pages='2'),
