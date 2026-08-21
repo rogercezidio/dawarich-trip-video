@@ -191,17 +191,19 @@ def main(argv=None):
     output_name = Path(args.output).name if args.output else f"{slugify_title(args.title)}.mp4"
     output_path = Path('/output') / output_name
 
-    with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as tmp_file:
-        json.dump(timeline_data, tmp_file)
-        timeline_path = Path(tmp_file.name)
-
+    timeline_path = None
     try:
+        with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as tmp_file:
+            timeline_path = Path(tmp_file.name)
+            json.dump(timeline_data, tmp_file)
+
         return run_visualizer(
             timeline_path, args.start, args.end, args.title, output_path,
             args.camera_movement, args.long_trip_compression,
         )
     finally:
-        timeline_path.unlink(missing_ok=True)
+        if timeline_path is not None:
+            timeline_path.unlink(missing_ok=True)
 
 
 if __name__ == '__main__':
