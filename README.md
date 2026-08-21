@@ -88,7 +88,7 @@ you've deployed it:
 docker build -t dawarich-trip-video .
 ```
 
-To run the test suite locally, install development dependencies with `pip install -r requirements-dev.txt requests && pytest`. Note that `requirements-dev.txt` is not needed for the Docker image.
+To run the test suite locally, install development dependencies with `pip install -r requirements-dev.txt && python -m pytest`. Note that `requirements-dev.txt` is not needed for the Docker image. (Use `python -m pytest`, not a bare `pytest`, so the repo root is on `sys.path`.)
 
 ## Credits
 
