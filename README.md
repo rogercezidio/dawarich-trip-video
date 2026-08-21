@@ -82,6 +82,17 @@ you've deployed it:
 | `--camera-movement` | no | `fixed`, `steady` (default), or `dynamic` |
 | `--long-trip-compression` | no | `off`, `gentle`, `balanced` (default), or `strong` |
 
+## Requirements
+
+The container needs outbound internet access during rendering: for every
+frame, the vendored visualizer fetches basemap tiles from CARTO's
+OpenStreetMap-based tile service. If that access is blocked (e.g. an
+egress-filtered network), the video will still render, but with a blank
+gray background instead of a map — silently, with no error output. Note
+also that fetching those tiles sends the trip's route coordinates to
+CARTO, a third party, which is worth knowing if you're running Dawarich
+specifically to keep your location history self-hosted.
+
 ## Building locally
 
 ```bash
