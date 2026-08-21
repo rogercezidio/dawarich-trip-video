@@ -143,9 +143,10 @@ def test_main_exits_when_start_is_after_end(monkeypatch, capsys):
     assert '--start' in capsys.readouterr().err
 
 
+@patch('generate_trip_video.output_dir_is_mounted', return_value=True)
 @patch('generate_trip_video.run_visualizer', return_value=0)
 @patch('generate_trip_video.fetch_points')
-def test_main_happy_path_invokes_visualizer(mock_fetch, mock_run, monkeypatch):
+def test_main_happy_path_invokes_visualizer(mock_fetch, mock_run, mock_output_dir, monkeypatch):
     monkeypatch.setenv('DAWARICH_URL', 'http://localhost:3000')
     monkeypatch.setenv('DAWARICH_API_KEY', 'test-key')
     mock_fetch.return_value = [{'latitude': '1', 'longitude': '2', 'timestamp': 100}]
@@ -179,8 +180,9 @@ def test_main_exits_when_api_key_missing(monkeypatch, capsys):
     assert 'api-key' in capsys.readouterr().err.lower()
 
 
+@patch('generate_trip_video.output_dir_is_mounted', return_value=True)
 @patch('generate_trip_video.fetch_points')
-def test_main_exits_when_no_points_found(mock_fetch, monkeypatch, capsys):
+def test_main_exits_when_no_points_found(mock_fetch, mock_output_dir, monkeypatch, capsys):
     monkeypatch.setenv('DAWARICH_URL', 'http://localhost:3000')
     monkeypatch.setenv('DAWARICH_API_KEY', 'test-key')
     mock_fetch.return_value = []
@@ -191,8 +193,9 @@ def test_main_exits_when_no_points_found(mock_fetch, monkeypatch, capsys):
     assert 'No points found' in capsys.readouterr().err
 
 
+@patch('generate_trip_video.output_dir_is_mounted', return_value=True)
 @patch('generate_trip_video.fetch_points')
-def test_main_surfaces_dawarich_api_errors(mock_fetch, monkeypatch, capsys):
+def test_main_surfaces_dawarich_api_errors(mock_fetch, mock_output_dir, monkeypatch, capsys):
     monkeypatch.setenv('DAWARICH_URL', 'http://localhost:3000')
     monkeypatch.setenv('DAWARICH_API_KEY', 'test-key')
     mock_fetch.side_effect = gtv.DawarichApiError("Dawarich returned 500")
@@ -201,3 +204,14 @@ def test_main_surfaces_dawarich_api_errors(mock_fetch, monkeypatch, capsys):
 
     assert exit_code == 1
     assert 'Dawarich returned 500' in capsys.readouterr().err
+
+
+@patch('generate_trip_video.output_dir_is_mounted', return_value=False)
+def test_main_exits_when_output_not_mounted(mock_output_dir, monkeypatch, capsys):
+    monkeypatch.setenv('DAWARICH_URL', 'http://localhost:3000')
+    monkeypatch.setenv('DAWARICH_API_KEY', 'test-key')
+
+    exit_code = gtv.main(['--start', '2026-07-12', '--end', '2026-07-26', '--title', 'Ceara 2026'])
+
+    assert exit_code == 1
+    assert '/output' in capsys.readouterr().err

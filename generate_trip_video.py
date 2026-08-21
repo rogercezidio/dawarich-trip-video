@@ -126,6 +126,10 @@ def build_argument_parser():
     return parser
 
 
+def output_dir_is_mounted():
+    return Path('/output').is_dir()
+
+
 def run_visualizer(timeline_path, start_date, end_date, title, output_path, camera_movement, compression):
     command = [
         sys.executable, str(VENDOR_SCRIPT),
@@ -159,6 +163,13 @@ def main(argv=None):
     ]
     if missing:
         print(f"Error: missing required setting(s): {', '.join(missing)}", file=sys.stderr)
+        return 1
+
+    if not output_dir_is_mounted():
+        print(
+            "Error: /output is not mounted — pass -v <host-dir>:/output to `docker run`.",
+            file=sys.stderr,
+        )
         return 1
 
     try:
