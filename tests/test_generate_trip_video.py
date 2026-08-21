@@ -92,6 +92,29 @@ def test_fetch_points_raises_on_other_error_status(mock_get):
         fetch_points('http://localhost:3000', 'key', date(2026, 7, 12), date(2026, 7, 12))
 
 
+@patch('generate_trip_video.requests.get')
+def test_fetch_points_raises_dawarich_api_error_on_invalid_json(mock_get):
+    response = Mock()
+    response.status_code = 200
+    response.json.side_effect = json.JSONDecodeError('Expecting value', '<html>not json</html>', 0)
+    response.headers = {'X-Total-Pages': '1'}
+    response.text = '<html>not json</html>'
+    mock_get.return_value = response
+
+    with pytest.raises(DawarichApiError):
+        fetch_points('http://localhost:3000', 'key', date(2026, 7, 12), date(2026, 7, 12))
+
+
+@patch('generate_trip_video.requests.get')
+def test_fetch_points_raises_dawarich_api_error_on_non_numeric_total_pages(mock_get):
+    mock_get.return_value = _mock_response(
+        [{'latitude': '1', 'longitude': '2', 'timestamp': 100}], total_pages='not-a-number',
+    )
+
+    with pytest.raises(DawarichApiError):
+        fetch_points('http://localhost:3000', 'key', date(2026, 7, 12), date(2026, 7, 12))
+
+
 import generate_trip_video as gtv
 
 

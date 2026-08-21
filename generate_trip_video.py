@@ -77,10 +77,23 @@ def fetch_points(base_url, api_key, start_date, end_date, per_page=DEFAULT_PER_P
                 f"Dawarich returned {response.status_code} for /api/v1/points: {response.text[:500]}",
             )
 
-        page_points = response.json()
+        request_url = f'{base_url}/api/v1/points'
+        try:
+            page_points = response.json()
+        except json.JSONDecodeError as error:
+            raise DawarichApiError(
+                f"Dawarich returned a non-JSON response for {request_url} "
+                "(check that --dawarich-url actually points at Dawarich, not a login page "
+                f"or reverse proxy): {error}",
+            ) from error
         points.extend(page_points)
 
-        total_pages = int(response.headers.get('X-Total-Pages', '1') or '1')
+        try:
+            total_pages = int(response.headers.get('X-Total-Pages', '1') or '1')
+        except ValueError as error:
+            raise DawarichApiError(
+                f"Dawarich returned a non-numeric X-Total-Pages header for {request_url}: {error}",
+            ) from error
         if params['page'] >= total_pages or not page_points:
             break
         params['page'] += 1
