@@ -19,3 +19,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Third-party licenses
+
+This project vendors a patched copy of
+[google-timeline-visualizer](https://github.com/mahlernim/google-timeline-visualizer)
+by mahlernim in `vendor/visualizer.py`, licensed under the MIT license. See
+`vendor/LICENSE.google-timeline-visualizer` for its full license text.
