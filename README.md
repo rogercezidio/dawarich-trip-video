@@ -44,6 +44,11 @@ docker run --rm -v "$(pwd)/output:/output" dawarich-trip-video \
 
 The video lands in `./output/Ceara_2026.mp4`.
 
+By default the container runs as root, so files written into the
+bind-mounted output directory will be root-owned on the host. If you'd
+rather they be owned by your own user, add `--user "$(id -u):$(id -g)"`
+to the `docker run` command.
+
 Both `--dawarich-url` and `--api-key` can instead be set as environment
 variables (`DAWARICH_URL`, `DAWARICH_API_KEY`) if you'd rather not pass the
 key as a CLI argument:
@@ -81,6 +86,11 @@ you've deployed it:
 | `--output` | no | Output filename under `/output` (default: derived from `--title`) |
 | `--camera-movement` | no | `fixed`, `steady` (default), or `dynamic` |
 | `--long-trip-compression` | no | `off`, `gentle`, `balanced` (default), or `strong` |
+
+`--start`/`--end` are interpreted in UTC (they become `T00:00:00Z` and
+`T23:59:59Z` respectively), so if you're far from UTC, points from the
+edges of your local calendar day may fall just outside — or just inside —
+the range you'd expect.
 
 ## Requirements
 
