@@ -145,6 +145,10 @@ def main(argv=None):
     parser = build_argument_parser()
     args = parser.parse_args(argv)
 
+    if args.start > args.end:
+        print("Error: --start must not be after --end.", file=sys.stderr)
+        return 1
+
     dawarich_url = resolve_setting(args.dawarich_url, 'DAWARICH_URL')
     api_key = resolve_setting(args.api_key, 'DAWARICH_API_KEY')
     missing = [

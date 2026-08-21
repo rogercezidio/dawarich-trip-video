@@ -133,6 +133,16 @@ def test_resolve_setting_returns_none_when_neither_is_set(monkeypatch):
     assert gtv.resolve_setting(None, 'DAWARICH_URL') is None
 
 
+def test_main_exits_when_start_is_after_end(monkeypatch, capsys):
+    monkeypatch.setenv('DAWARICH_URL', 'http://localhost:3000')
+    monkeypatch.setenv('DAWARICH_API_KEY', 'test-key')
+
+    exit_code = gtv.main(['--start', '2026-07-26', '--end', '2026-07-12', '--title', 'Ceara 2026'])
+
+    assert exit_code == 1
+    assert '--start' in capsys.readouterr().err
+
+
 @patch('generate_trip_video.run_visualizer', return_value=0)
 @patch('generate_trip_video.fetch_points')
 def test_main_happy_path_invokes_visualizer(mock_fetch, mock_run, monkeypatch):
