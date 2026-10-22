@@ -95,13 +95,20 @@ the range you'd expect.
 ## Requirements
 
 The container needs outbound internet access during rendering: for every
-frame, the vendored visualizer fetches basemap tiles from CARTO's
-OpenStreetMap-based tile service. If that access is blocked (e.g. an
-egress-filtered network), the video will still render, but with a blank
-gray background instead of a map — silently, with no error output. Note
-also that fetching those tiles sends the trip's route coordinates to
-CARTO, a third party, which is worth knowing if you're running Dawarich
-specifically to keep your location history self-hosted.
+frame, the vendored visualizer fetches basemap tiles from OpenStreetMap's
+tile server (`tile.openstreetmap.org`), no API key needed. If that access
+is blocked (e.g. an egress-filtered network), the video will still
+render, but with a blank gray background instead of a map — silently,
+with no error output. Note also that fetching those tiles sends the
+trip's route coordinates to the OpenStreetMap Foundation, a third party,
+which is worth knowing if you're running Dawarich specifically to keep
+your location history self-hosted.
+
+Tiles are used under OpenStreetMap's
+[tile usage policy](https://operations.osmfoundation.org/policies/tiles/):
+every video carries a "© OpenStreetMap contributors" attribution in the
+bottom-right corner, and requests identify themselves with a
+`dawarich-trip-video` User-Agent.
 
 ## Building locally
 
@@ -118,10 +125,12 @@ The rendering engine is a vendored, patched copy of
 by [@mahlernim](https://github.com/mahlernim) (MIT license), pinned to
 upstream commit
 [`676ee3d`](https://github.com/mahlernim/google-timeline-visualizer/commit/676ee3de8a7c0b50f4f7c84337500d9708570903).
-The only change: its `--year` (calendar-year-only) filter is replaced with
+Two changes: its `--year` (calendar-year-only) filter is replaced with
 an explicit `--start-date`/`--end-date` range, to match Dawarich trip
-windows that don't necessarily align to a calendar year. See
-`vendor/visualizer.py` for the exact patch (search for `PATCHED`).
+windows that don't necessarily align to a calendar year; and its basemap
+tiles come from OpenStreetMap instead of CARTO, which now requires an
+API key. See `vendor/visualizer.py` for the exact patch (search for
+`PATCHED`).
 
 ## License
 
