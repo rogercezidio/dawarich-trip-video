@@ -7,6 +7,9 @@
 #              (--start-date/--end-date), to match Dawarich trip windows that can
 #              span or fall outside a single calendar year. See patches below,
 #              search this file for "PATCHED".
+#              Basemap tiles switched from CARTO (which now requires an API key)
+#              to OpenStreetMap, with an identifying User-Agent and the
+#              attribution OSM's tile usage policy requires.
 # --- END VENDORED COPY HEADER ---
 """
 Google Timeline Visualizer
@@ -52,7 +55,10 @@ DEFAULT_FPS = 30
 DEFAULT_DURATION = 90
 DEFAULT_TAIL_KM = 500
 THEME_COLOR = '#ff0055' # Pink/Red
-TILE_URL = "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"  # PATCHED
+# PATCHED: OSM's tile usage policy rejects generic/faked User-Agents.
+TILE_USER_AGENT = "dawarich-trip-video (+https://github.com/rogercezidio/dawarich-trip-video)"
+TILE_ATTRIBUTION = "\u00a9 OpenStreetMap contributors"  # PATCHED
 
 
 class TimelineCliError(Exception):
@@ -284,7 +290,7 @@ def fetch_tile_img(x, y, z):
     if key in TILE_CACHE: return TILE_CACHE[key]
     url = TILE_URL.format(z=z, x=x, y=y)
     try:
-        req = urllib.request.Request(url, headers={'User-Agent': "Mozilla/5.0"})
+        req = urllib.request.Request(url, headers={'User-Agent': TILE_USER_AGENT})  # PATCHED
         with urllib.request.urlopen(req) as response:
             img = Image.open(io.BytesIO(response.read())).convert('RGB')
             TILE_CACHE[key] = img
@@ -728,6 +734,10 @@ def main(argv=None):
     date_text = ax.text(0.5, 0.90, '', transform=ax.transAxes, 
                         color='gray', fontsize=14, ha='center', va='top',
                         bbox=dict(facecolor='white', alpha=0.5, edgecolor='none', pad=3))
+
+    ax.text(0.99, 0.01, TILE_ATTRIBUTION, transform=ax.transAxes,  # PATCHED
+            color='black', fontsize=9, ha='right', va='bottom',
+            bbox=dict(facecolor='white', alpha=0.6, edgecolor='none', pad=2))
 
     def update(i):
         frame_idx = frame_indices[i]
